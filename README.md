@@ -1,2 +1,2 @@
 # whiskey_release_radar
-Simple web scraping application to trak new whiskey releases
+Simple web scraping application to track new whiskey releases
