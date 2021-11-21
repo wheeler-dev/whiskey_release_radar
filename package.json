@@ -1,0 +1,31 @@
+{
+  "name": "whiskey_release_radar",
+  "version": "0.0.1",
+  "description": "Web scraping micro service to track new whiskey releases via email",
+  "main": "app.js",
+  "scripts": {
+    "start-dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wheeler-dev/whiskey_release_radar.git"
+  },
+  "keywords": [
+    "whikey",
+    "release"
+  ],
+  "author": "wheeler-dev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wheeler-dev/whiskey_release_radar/issues"
+  },
+  "homepage": "https://github.com/wheeler-dev/whiskey_release_radar#readme",
+  "dependencies": {
+    "jsdom": "^18.0.1",
+    "puppeteer": "^11.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
