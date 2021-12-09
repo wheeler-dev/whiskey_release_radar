@@ -6,6 +6,15 @@ const fs = require('fs')
 // as a workaround we create a new JSDOM from the pagecontent for development
 module.exports = async () => {
 
+
+    // fs.readFile('./storage/weinquelle_modified' + '.json', 'utf-8', async (err, data) => {
+    //     const value = JSON.parse(data)
+    //     const ergebnis = await file_manager.compareWithRecentData(value, 'weinquelle')
+    //     console.log('newArrivalsWeinquelle: ', ergebnis)
+    // })
+
+
+
     try {
         const URL = 'https://www.getraenkewelt-weiser.de/category.php/whisky/neuheiten'
         const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] })
@@ -33,18 +42,12 @@ module.exports = async () => {
             // console.log(child.getAttribute('id'))
 
             const title = child.getElementsByClassName('artListDesc')[0].firstChild.firstChild.title
-            // console.log('title: ', title)
 
             const link = child.getElementsByClassName('artListDesc')[0].firstChild.firstChild.href
-            // console.log('link: ', link)
 
             let price = child.getElementsByClassName('artListPrice')[0].innerHTML.trim()
             price = price.substr(0, price.indexOf(' '))
-            // console.log('price: ', price)
-
-            // i++
-            // console.log(i, '---------------------------------------------------------------------------------------------------------------')
-
+            
             let singleElement = {
                 title: title,
                 link: link,
@@ -68,48 +71,6 @@ module.exports = async () => {
 
         console.log(allElements)
         console.log(allElements.length)
-
-        // fs.readFile('lastCollection.json', 'utf-8', (err, data) => {
-        //     const dataAr = JSON.parse(data)
-        //     console.log(dataAr)
-        // });
-
-        // fs.writeFile('lastCollection.json', JSON.stringify(allElements), 'utf-8', () => {
-        //     console.log('wrote to file')
-        // })
-
-        // let array1 = []
-        // let array2 = []
-
-        // fs.readFile('lastCollection.json', 'utf-8', (err, data) => {
-        //     array1 = JSON.parse(data)
-        //     string1 = data
-        //     string1 = string1.replace(/\\"/g, '"');
-        //     // console.log(array1)
-
-        //     fs.readFile('lastCollectionPLUS1.json', 'utf-8', (err, data) => {
-        //         array2 = JSON.parse(data)
-        //         string2 = data
-        //         // console.log(array2)
-
-        //         console.log('a1: ', array1.length)
-        //         console.log('a2: ', array2.length)
-
-        //         array2.forEach((element) => {
-        //             if (string1.indexOf(element.title) === -1) {
-        //                 console.log('neu: ', element)
-        //             }
-        //             // console.log(element.title)
-        //             // console.log(string1.indexOf(element.title))
-        //         })
-
-        //     });
-        // });
-
-
-        // console.log(array1)
-        // console.log(array2)
-
 
         // await browser.close()
     } catch (error) {
