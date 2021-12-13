@@ -1,7 +1,6 @@
 const fs = require('fs')
 
-
-module.exports = class file_manager {
+module.exports = class fileManager {
 
     static async compareWithRecentData(newDataArray, shopName) {
 

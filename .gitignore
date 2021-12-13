@@ -1,6 +1,10 @@
 # Application File Storage
 storage
 
+# Google Auth
+credentials.json
+token.json
+
 # Logs
 logs
 *.log

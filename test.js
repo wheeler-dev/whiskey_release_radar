@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer')
 const { JSDOM } = require('jsdom')
 const fs = require('fs')
+const file_manager = require('./file-manager')
 
 // can not log to console inside puppeteers page.evaluate() function
 // as a workaround we create a new JSDOM from the pagecontent for development
@@ -9,9 +10,13 @@ module.exports = async () => {
 
     // fs.readFile('./storage/weinquelle_modified' + '.json', 'utf-8', async (err, data) => {
     //     const value = JSON.parse(data)
+    //     console.log('length: ', value.length)
     //     const ergebnis = await file_manager.compareWithRecentData(value, 'weinquelle')
     //     console.log('newArrivalsWeinquelle: ', ergebnis)
     // })
+
+
+    // return
 
 
 

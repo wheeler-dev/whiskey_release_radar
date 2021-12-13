@@ -57,8 +57,7 @@ module.exports = class shop_Weinquelle {
                 return allElements
 
             });
-
-            console.log('scraped articles weinquelle.com: ', data.length)
+            
             arrivals = data
             await browser.close()
 

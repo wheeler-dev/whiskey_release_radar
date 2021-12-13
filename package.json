@@ -4,6 +4,7 @@
   "description": "Web scraping micro service to track new whiskey releases via email",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "start-dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,6 +23,7 @@
   },
   "homepage": "https://github.com/wheeler-dev/whiskey_release_radar#readme",
   "dependencies": {
+    "googleapis": "^92.0.0",
     "jsdom": "^18.0.1",
     "puppeteer": "^11.0.0"
   },

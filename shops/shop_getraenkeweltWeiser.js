@@ -78,7 +78,6 @@ module.exports = class shop_GetraenkeWeltWeiser {
                 }
             }
 
-            console.log('scraped articles getraenkewelt-weiser.de: ', data.length)
             arrivals = data
             await browser.close()
 

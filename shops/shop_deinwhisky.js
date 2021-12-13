@@ -86,7 +86,6 @@ module.exports = class shop_DeinWhisky {
 
             })
 
-            console.log('scraped articles deinwhisky.de: ', data.length)
             arrivals = data
             await browser.close()
 
