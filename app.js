@@ -1,49 +1,86 @@
-const shop_Weinquelle = require('./shops/shop_weinquelle')
-const shop_GetraenkeWeltWeiser = require('./shops/shop_getraenkeweltweiser')
-const shop_DeinWhisky = require('./shops/shop_deinwhisky')
-const file_Manager = require('./file-manager')
-const email_Service = require('./email-service')
-
-const test = require('./test')
-
-// test()
+import shops from './shops.js';
+import FileManager from './file-manager.js';
+import EmailService from './email-service.js';
+import puppeteer from 'puppeteer';
+import chalk from 'chalk';
+// import test from './test.js';
 
 const app = async () => {
 
-    const shops = [
-        {
-            name: 'weinquelle',
-            class: shop_Weinquelle
-        }, 
-        {
-            name: 'getraenkeWeltWeiser',
-            class: shop_GetraenkeWeltWeiser
-        }, 
-        // {
-        //     name: 'deinWhiskey',
-        //     class: shop_DeinWhisky
-        // }, 
-    ]
+    // setup and authenticate
+    await EmailService.askOutPutEmail();
+    await EmailService.authenticateWithGoogle();
 
-    await email_Service.askOutPutEmail();
-    await email_Service.authenticateWithGoogle();
+    // create browser instance
+    const browser = await puppeteer.launch({ 
+        headless: false, 
+        args: ['--no-sandbox', '--disable-setuid-sandbox'] 
+    });
 
-    // setTimeout(() => {
-    //     // trigger parses
-    // }, 300000)
+    // start the process
+    const init = async () => {
 
-    shops.forEach( async (shop) => {
+        console.log(chalk.bgYellow.black('Scraping Process started...'));
+        console.log('--------------------------------');
 
-        const arrivals = await shop.class.parseArrivals()
-        console.log('available articles for ' + shop.name + ': ', arrivals.length)
+        let promises = shops.map(shop => 
+            shop.class.parseArrivals(browser, shop.url, shop.name)
+        );
 
-        const newArrivals = await file_Manager.compareWithRecentData(arrivals, shop.name)
-        console.log('newArrivals for ' + shop.name + ': ', newArrivals.length)
+        Promise.allSettled(promises).then(async (results) => {
+            let finalResults = [];
 
-        // await email_Service.sendReleaseAlarmEmail(newArrivals, shop.name)
+            for (const [index, result] of results.entries()) {
+                if (result.status === 'fulfilled') {
 
-    })
+                    // promise.allSettled method returns in the order of the shops.js array
+                    const shop = shops[index];
 
-}
+                    // compare and store data
+                    const newArrivals = await FileManager.compareWithRecentData(
+                        result.value, 
+                        shop.name
+                    );
 
-app()
+                    let shopResult = {
+                        shop: shops[index].name,
+                        articles: result.value.length,
+                        new: newArrivals.length
+                    };
+
+                    // send email if there are new arrivals
+                    if (newArrivals.length > 0) {
+                        await EmailService.sendReleaseAlarmEmail(newArrivals, shopResult.shop);
+                        console.log(chalk.greenBright.bold('Email has been sent.'))
+                    }
+
+                    finalResults.push(shopResult);
+
+                } else if (result.status === 'rejected') {
+                    // send error mail ?
+                    console.log('rejected');
+                }
+            }
+
+            console.log(chalk.bgGreen.black('Scraping Process finished.'));
+            console.log('--------------------------------');
+            console.table(finalResults);
+
+            // returning function to keep it infinitely running on a loop
+            // this should never resolve
+            // eventually use process manage (pm2) on a server to restart app in certain time intervals or in case it crashes
+            setTimeout(() => {
+                return init();
+            }, 600000); // 10 minute break before next run
+        });
+    };
+
+    await init();
+
+    process.on('exit', async () => {
+        await browser.close();
+    });
+};
+
+// test()
+app();

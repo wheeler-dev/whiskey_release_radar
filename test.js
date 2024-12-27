@@ -1,31 +1,30 @@
-const puppeteer = require('puppeteer')
-const { JSDOM } = require('jsdom')
-const fs = require('fs')
-const file_manager = require('./file-manager')
+import puppeteer from 'puppeteer';
+import { JSDOM } from 'jsdom';
+import fs from 'fs';
+import FileManager from './file-manager.js';
+import { title } from 'process';
 
 // can not log to console inside puppeteers page.evaluate() function
 // as a workaround we create a new JSDOM from the pagecontent for development
-module.exports = async () => {
-
-
+export default async () => {
     // fs.readFile('./storage/weinquelle_modified' + '.json', 'utf-8', async (err, data) => {
     //     const value = JSON.parse(data)
     //     console.log('length: ', value.length)
-    //     const ergebnis = await file_manager.compareWithRecentData(value, 'weinquelle')
+    //     const ergebnis = await FileManager.compareWithRecentData(value, 'weinquelle')
     //     console.log('newArrivalsWeinquelle: ', ergebnis)
     // })
 
-
     // return
 
-
-
     try {
-        const URL = 'https://www.getraenkewelt-weiser.de/category.php/whisky/neuheiten'
-        const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] })
-        const page = await browser.newPage()
+        const URL = 'https://www.weisshaus.de/whisky/?p=40';
+        const browser = await puppeteer.launch({ 
+            headless: false, 
+            args: ['--no-sandbox', '--disable-setuid-sandbox'] 
+        });
+        const page = await browser.newPage();
 
-        await page.goto(URL)
+        await page.goto(URL);
 
         await page.setViewport({
             width: 1200,
@@ -36,49 +35,47 @@ module.exports = async () => {
         const dom = new JSDOM(pageContent);
         const { document } = dom.window;
 
-        let productList = document.getElementsByClassName('productList')[0];
-        let htmlCollection = productList.getElementsByClassName('panel-body')[0];
-        const children = [...htmlCollection.children];
+        let productListContainer = document.getElementsByClassName('listing--container')[0];
+        let products = Array.from(productListContainer.getElementsByClassName('listing')[0].children);
 
-        let i = 0
-        let allElements = []
-        children.forEach((child) => {
-            // console.log(child.getAttributeNames())
-            // console.log(child.getAttribute('id'))
+        products.forEach((product, index) => {
+            const productInfo = product.getElementsByClassName('product--info')[0];
 
-            const title = child.getElementsByClassName('artListDesc')[0].firstChild.firstChild.title
+            if (productInfo) {
+                let title = productInfo.getElementsByClassName('product--title')[0].title;
+                title = title.replace(/&amp;/g, '&');
+                let link = productInfo.getElementsByClassName('product--title')[0].href;
 
-            const link = child.getElementsByClassName('artListDesc')[0].firstChild.firstChild.href
+                // let priceInfo = productInfo.getElementsByClassName('product--price-info')[0]
 
-            let price = child.getElementsByClassName('artListPrice')[0].innerHTML.trim()
-            price = price.substr(0, price.indexOf(' '))
-            
-            let singleElement = {
-                title: title,
-                link: link,
-                price: price
+                let price = productInfo.getElementsByClassName('price--default')[0].innerHTML;
+                price = price.substr(0, price.indexOf('&nbsp;€')).replace(/\n/g, '') + '€';
+
+                let p = {
+                    title: title,
+                    link: link,
+                    price: price
+                };
+
+                console.log(p);
+            } else {
+                // do nothing - not a productlisting but a promotion message
             }
-            allElements.push(singleElement)
-
         });
 
-        let pagination = productList.getElementsByClassName('pagination')[0]
-        let paginationListItems = [...pagination.children]
+        // let nextButton = document.getElementsByClassName('listing--bottom-paging')[0].getElementsByClassName('right')[0].getElementsByClassName('icon--arrow-right')[0].length > 0
 
-        console.log(paginationListItems)
+        let nextPageAvailable = document.getElementsByClassName('listing--bottom-paging')[0]
+            .getElementsByClassName('right')[0]
+            .getElementsByClassName('icon--arrow-right').length > 0;
 
-        paginationListItems.forEach((listEl) => {
-            if (listEl.firstChild.title === "Nächste Seite") {
-                console.log('el: ', listEl.firstChild.href)
-            } else {
-            }
-        })
+        // click auf parent
+        // document.getElementsByClassName('listing--bottom-paging')[0].getElementsByClassName('right')[0].getElementsByClassName('icon--arrow-right')[0].parentElement.click()
 
-        console.log(allElements)
-        console.log(allElements.length)
+        console.log(nextPageAvailable);
 
         // await browser.close()
     } catch (error) {
-        console.error(error)
+        console.error(error);
     }
-}
+};

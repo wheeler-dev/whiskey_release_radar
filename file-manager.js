@@ -1,39 +1,41 @@
-const fs = require('fs')
+import { existsSync, readFileSync, writeFile } from 'fs';
 
-module.exports = class fileManager {
-
+export default class FileManager {
     static async compareWithRecentData(newDataArray, shopName) {
-
-        let newArrivals = []
+        let newArrivals = [];
 
         // check if previously stored data exists
-        const recentDataStored = fs.existsSync('./storage/' + shopName + '.json');
+        const recentDataStored = existsSync(`./storage/${shopName}.json`);
 
         if (!recentDataStored) {
-            this.storeToFile(newDataArray, shopName)
-            return []
+            this.storeToFile(newDataArray, shopName, true);
+            return [];
         }
 
-        const recentDataString = fs.readFileSync('./storage/' + shopName + '.json', 'utf-8');
+        const recentDataString = readFileSync(`./storage/${shopName}.json`, 'utf-8');
 
         newDataArray.forEach((element) => {
             if (recentDataString.indexOf(JSON.stringify(element.title)) === -1) {
-                newArrivals.push(element)
+                newArrivals.push(element);
             }
-        })
+        });
 
         // update the stored file with latest data
-        // this.storeToFile(newDataArray, shopName)
+        this.storeToFile(newDataArray, shopName, false);
 
-        return newArrivals
+        return newArrivals;
     }
 
-    static async storeToFile(dataArray, shopName) {
-
-        fs.writeFile('./storage/' + shopName + '.json', JSON.stringify(dataArray), 'utf-8', () => {
-            console.log('wrote to file: ', shopName)
-        })
-
+    static async storeToFile(dataArray, shopName, created) {
+        writeFile(
+            `./storage/${shopName}.json`,
+            JSON.stringify(dataArray),
+            'utf-8',
+            () => {
+                created 
+                    ? console.log('CREATED storage file: ', shopName)
+                    : console.log('UPDATED storage file: ', shopName);
+            }
+        );
     }
-
 }
