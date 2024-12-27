@@ -4,19 +4,21 @@
 
 ### **About:**
 
-This application uses [puppeteer](https://github.com/puppeteer/puppeteer) to frequently check the available products for several different liquor online shops based in germany.
+This application uses [puppeteer](https://github.com/puppeteer/puppeteer) to frequently check the available products of several different liquor online shops based in germany.
 Once the available products have been extracted they will be safed into a JSON file in the /storage subdirectory and another run will be queued.
 Products consist of a title and price attribute, as well as a link to the products detail page where it can be bought.
-On every subsequent run, the new product list will be compared to the previously stored one to aquire the new releases.
+On every subsequent run, the new product list will be compared to the previously stored one to aquire any newly released products.
 A list of those new releases will then be sent to the provided email adress.
 
 ### **Prerequisites:**
+
+> Node and npm
 
 > This app needs to be authorized with a google account to send e-mails through it.<br/>
 > The gmail api needs to be activated for this account in the [google api console](https://console.cloud.google.com/apis).<br/>
 > A more detailed guide on how to setup an account for usage with google apis can be found [here](https://developers.google.com/identity/protocols/oauth2).
 > After creating credentials, the generated _credentials.json_ file needs to be placed at the root of this project.<br/>
-> Helpful tip: Setting your _credentials.json_ "redirect_uris" to `["urn:ietf:wg:oauth:2.0:oob", "http://localhost"]` for your desktop application may help, if you encountering redirect issues during the authentication process
+> Helpful tip: Setting your _credentials.json_ `"redirect_uris"` to `["urn:ietf:wg:oauth:2.0:oob", "http://localhost"]` for your desktop application may help, if you encountering redirect issues during the authentication process
 
 ### **How to run:**
 
@@ -31,7 +33,7 @@ Afterwards the application will try to authenticate with google and therefore pr
 > If you encounter the message: _"Error loading client secret file"_<br/>
 > Make sure you stored your google accounts _credentials.json_ at the root of the project folder, as described above.
 
-Follow the link, log into the google account and copy the generated token back into the console to complete the app authentication process.<br/>
+Follow the link, log into the google account, grant the requested access and copy the generated token back into the console to complete the app authentication process.<br/>
 If a previously stored token is available and still valid, this step will be skipped.<br/>
 From this point on, the application will keep track of new products available on a 10-minute intervall.
 
@@ -81,7 +83,7 @@ New arrivals will be passed to the email service and sent through the authentica
 
 - let the user define keywords and price range to filter the arrivals title and price attributes that are sent to them
 - improve release e-mail layout
-- upload scraped json data to a google sheet or database
+- upload scraped json data to a google sheet or database, gather price data
 - set up an express server and expose an api to subscribe to the bot
 - build a frontend/website to consume api
 - set up a twitter account for the bot to tweet new arrivals
